@@ -1,0 +1,53 @@
+
+# Ignore compiled Python files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Ignore environment and virtual environment directories
+venv/
+.env/
+
+# Ignore IDE/editor-specific files
+.vscode/
+.idea/
+*.suo
+*.ntvs_analysis.dat
+*.ncb
+*.sln
+*.sw?
+*.sublime-workspace
+*.sublime-project
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Ignore project-specific files
+notes.txt
+
+# Ignore specific files for testing purposes (if any)
+tests/
+
+# Ignore any other sensitive or irrelevant files
+*.env
+*.sqlite3
+
+# Ignore build directories
+build/
+dist/
+
+# Ignore any files that should not be in version control
+*.db
+*.pem
+*.key
+
+# Add any other files or directories you want Git to ignore
