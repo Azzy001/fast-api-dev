@@ -37,16 +37,6 @@
             with:
               # Fetch entire history of the repository
               fetch-depth: 0
-          - name: Setup Node.js
-            uses: actions/setup-node@v4
-            with:
-              # Use Node.js version 14.x
-              node-version: "14.x"
-              # Cache npm dependencies for faster builds
-              cache: "npm"
-          - name: Install Dependencies
-            # Install project dependencies using npm  
-            run: npm install
     
       # Run Security Scan
       security-scan:
