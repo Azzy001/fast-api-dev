@@ -53,7 +53,7 @@
             uses: gitleaks/gitleaks-action@v2
             env:
               # Gitleaks scans for sensitive data in the codebase
-              GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
            
       # Run Code Lint
       code-lint:
@@ -74,7 +74,7 @@
             uses: super-linter/super-linter@v6.6.0
             env:
               # Super-linter checks code for stylistic and syntactical errors
-              GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
             
       # Check Dependencies
       check-dependencies:
@@ -133,4 +133,4 @@
               # Inserts docs into README
               output-method: inject
             env:
-              token: ${{ secrets.REPO_ACCESS_TOKEN }}
+              token: ${{ secrets.GITHUB_TOKEN  }}
