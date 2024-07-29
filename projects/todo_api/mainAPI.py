@@ -5,9 +5,6 @@ from enum import Enum
 import datetime
 import logging
 
-
-# --------------------
-
 # Initialize FastAPI application
 # Create an instance of FastAPI which will be used to define routes and handle requests
 app = FastAPI()
@@ -30,7 +27,7 @@ class PriorityEnum(str, Enum):
     medium = "medium"
     high = "high"
 
-# --------------------
+# =========================
 
 # Define To-Do List model using Pydantic
 # This model defines the structure of the data for a to-do list item
@@ -44,13 +41,13 @@ class ToDoList(BaseModel):
     creation_date: datetime.date
     last_updated_date: Optional[datetime.date] = None
 
-# --------------------
+# =========================
 
 # In-memory storage for To-Do Lists
 # A dictionary to store to-do lists temporarily
 toDoList_db: Dict[str, ToDoList] = {}
 
-# --------------------
+# =========================
 
 # Endpoint to create a batch of to-do lists
 # This endpoint accepts a list of to-do lists and adds them to the in-memory database
@@ -69,7 +66,7 @@ def create_to_do_list(lists: List[ToDoList]):
         logging.info(f"Created list with ID {lst.id}")
     return created_lists
 
-# --------------------
+# =========================
 
 # Endpoint to get all to-do lists
 # This endpoint returns all to-do lists stored in the in-memory database
@@ -81,7 +78,7 @@ def get_to_do_list():
     logging.info(f"Retrieving all to-do lists. Total count: {len(toDoList_db)}")
     return list(toDoList_db.values())
 
-# --------------------
+# =========================
 
 # Endpoint to get a specific to-do list by ID
 # This endpoint returns a single to-do list identified by its ID
@@ -95,7 +92,7 @@ def get_to_do_list_by_id(lst_id: str):
     else:
         raise HTTPException(status_code=404, detail="ToDoList not found.")
 
-# --------------------
+# =========================
 
 # Endpoint to update a specific to-do list by ID
 # This endpoint updates a to-do list identified by its ID with new data
@@ -110,7 +107,7 @@ def update_to_do_list(lst_id: str, list_data: ToDoList):
     else:
         raise HTTPException(status_code=404, detail="ToDoList not found.")
 
-# --------------------
+# =========================
 
 # Endpoint to delete a specific to-do list by ID
 # This endpoint removes a to-do list identified by its ID from the in-memory database
@@ -124,7 +121,7 @@ def delete_to_do_list(lst_id: str):
     else:
         raise HTTPException(status_code=404, detail="ToDoList not found.")
 
-# --------------------
+# =========================
 
 # Entry point to run the FastAPI application
 # This block ensures the FastAPI application runs when this script is executed directly

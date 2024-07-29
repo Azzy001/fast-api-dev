@@ -1,0 +1,146 @@
+---
+    name: Project Pipeline
+    
+    # Defining events that trigger workflow
+    on:
+      pull_request:
+        # Trigger on pull requests to any branch
+        branches:
+          - "*"
+        types:
+          - opened
+          - edited
+          - reopened
+          - synchronize
+    
+      push:
+        branches:
+          # Trigger on pushes to the main branch
+          - main
+    
+    # Set top-level permissions
+    permissions:
+      # Read access to repository contents
+      contents: read
+      # Read access to packages (e.g., npm packages) 
+      packages: read
+    
+    # Define the workflow jobs
+    jobs:
+      # Initial Checkout and Setup
+      checkout-and-setup:
+        name: "1. Checkout and Setup"
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v4
+            with:
+              # Fetch entire history of the repository
+              fetch-depth: 0
+          - name: Setup Node.js
+            uses: actions/setup-node@v4
+            with:
+              # Use Node.js version 14.x
+              node-version: "14.x"
+              # Cache npm dependencies for faster builds
+              cache: "npm"
+          - name: Install Dependencies
+            # Install project dependencies using npm  
+            run: npm install
+    
+      # Run Security Scan
+      security-scan:
+        name: "2. Run Security Scan"
+        needs: checkout-and-setup
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v4
+            with:
+              # Fetch entire history of the repository
+              fetch-depth: 0
+          - name: Run Security Scanner
+            uses: gitleaks/gitleaks-action@v2
+            env:
+              # Gitleaks scans for sensitive data in the codebase
+              GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+           
+      # Run Code Lint
+      code-lint:
+        name: "3. Run Code Lint"
+        needs: security-scan
+        runs-on: ubuntu-latest
+        permissions:
+          contents: read
+          packages: read
+          statuses: write
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v4
+            with:
+              # Fetch the entire history of the repository
+              fetch-depth: 0
+          - name: Run Code Linter
+            uses: super-linter/super-linter@v6.6.0
+            env:
+              # Super-linter checks code for stylistic and syntactical errors
+              GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+            
+      # Check Dependencies
+      check-dependencies:
+        name: "4. Check Dependencies"
+        needs: code-lint
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v4
+          - name: Setup Node.js
+            uses: actions/setup-node@v4
+            with:
+              # Use Node.js version 14.x
+              node-version: "14.x"
+          - name: Install Clean Dependencies
+            # Install dependencies based on package-lock.json for consistency  
+            run: npm ci
+          - name: Run Outdated Check
+            # Check for outdated dependencies to ensure they are up-to-date
+            uses: odanado/outdated-check-action@v0
+      
+      # Generate Changelog
+      generate-changelog:
+        name: "5. Generate Changelog"
+        runs-on: ubuntu-latest
+        needs: check-dependencies
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v4
+            with:
+              # Fetch the entire history of the repository
+              fetch-depth: 0
+          - name: Generate Changelog
+            # Generate a changelog based on commit history for project documentation
+            run: |
+              git log --pretty=format:"* %h - %an, %ar : %s" > CHANGELOG.md
+              cat CHANGELOG.md  # Output the changelog
+    
+      update-readme-with-terraform-docs:
+        name: "6. Generate tf module docs"
+        # Runs on Ubuntu environment
+        runs-on: ubuntu-latest
+        needs: generate-changelog
+        steps:
+          # Fetches code from the pull request
+          - uses: actions/checkout@v4
+    
+          - name: Generate Terraform module docs and update README.md
+            # Uses a tool to generate docs
+            uses: terraform-docs/gh-actions@v1.2.0
+            with:
+              # Works in the main repository folder
+              working-dir: .
+              # Updates the README with docs
+              output-file: README.md
+              # Inserts docs into README
+              output-method: inject
+            env:
+              token: ${{ secrets.REPO_ACCESS_TOKEN }}
