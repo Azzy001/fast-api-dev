@@ -1,0 +1,10 @@
+fastapi[all]
+pydantic[email]
+slowapi
+beautifulsoup4
+requests
+httpx
+sqlalchemy
+uvicorn
+uvicorn[standard]
+asyncio
